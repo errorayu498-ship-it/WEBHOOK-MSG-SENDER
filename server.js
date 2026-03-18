@@ -1,10 +1,9 @@
+const express = require("express")
+const axios = require("axios")
+const fs = require("fs")
+const cors = require("cors")
 
-const express=require("express")
-const axios=require("axios")
-const fs=require("fs")
-const cors=require("cors")
-
-const app=express()
+const app = express()
 
 app.use(express.json())
 app.use(cors())
@@ -14,20 +13,6 @@ let running=false
 let progress={current:0,total:0}
 
 const historyFile="./data/history.json"
-const visitorFile="./data/visitors.json"
-
-if(!fs.existsSync(visitorFile)){
-fs.writeFileSync(visitorFile,JSON.stringify({count:0}))
-}
-
-app.get("/visit",(req,res)=>{
-
-let v=JSON.parse(fs.readFileSync(visitorFile))
-v.count++
-fs.writeFileSync(visitorFile,JSON.stringify(v))
-res.json(v)
-
-})
 
 function saveHistory(data){
 
@@ -61,7 +46,7 @@ return html
 
 }
 
-async function send(token,channel,msg,isBot){
+async function sendMessage(token,channel,message,isBot){
 
 let headers={}
 
@@ -73,43 +58,34 @@ headers.Authorization=token
 
 await axios.post(
 `https://discord.com/api/v10/channels/${channel}/messages`,
-{content:msg},
+{content:message},
 {headers}
 )
 
 }
 
-app.post("/sendToken",async(req,res)=>{
+app.post("/sendWebhook",async(req,res)=>{
 
-const {tokens,channel,message,amount,delay,type}=req.body
-
+const {url,message,amount,delay}=req.body
 const msg=cleanMessage(message)
 
 running=true
 progress.total=amount
 progress.current=0
 
-for(let t of tokens){
-
 for(let i=0;i<amount;i++){
 
 if(!running) break
 
 try{
-
-await send(t,channel,msg,type==="bot")
-
+await axios.post(url,{content:msg})
 }catch(e){
-
-console.log("Send error",e.message)
-
+console.log(e.message)
 }
 
 progress.current++
 
 await new Promise(r=>setTimeout(r,delay*1000))
-
-}
 
 }
 
@@ -119,9 +95,9 @@ res.json({status:"done"})
 
 })
 
-app.post("/sendWebhook",async(req,res)=>{
+app.post("/sendToken",async(req,res)=>{
 
-const {url,message,amount,delay}=req.body
+const {token,channel,message,amount,delay,type}=req.body
 
 const msg=cleanMessage(message)
 
@@ -129,23 +105,23 @@ running=true
 progress.total=amount
 progress.current=0
 
+try{
+
 for(let i=0;i<amount;i++){
 
 if(!running) break
 
-try{
-
-await axios.post(url,{content:msg})
-
-}catch(e){
-
-console.log(e.message)
-
-}
+await sendMessage(token,channel,msg,type==="bot")
 
 progress.current++
 
 await new Promise(r=>setTimeout(r,delay*1000))
+
+}
+
+}catch(e){
+
+console.log(e.message)
 
 }
 
@@ -160,14 +136,10 @@ res.json(progress)
 })
 
 app.post("/stop",(req,res)=>{
-
 running=false
 res.json({status:"stopped"})
-
 })
 
 app.listen(3000,()=>{
-
 console.log("Portal running on port 3000")
-
 })
