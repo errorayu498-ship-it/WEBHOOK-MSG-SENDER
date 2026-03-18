@@ -1,9 +1,8 @@
-var quill = new Quill('#editor',{theme:'snow'})
+var quill=new Quill("#editor",{theme:"snow"})
 
-function log(msg){
-
-document.getElementById("status").innerHTML+=`<p>${msg}</p>`
-
+function sendOnce(){
+document.getElementById("amount").value=1
+start()
 }
 
 async function start(){
@@ -11,34 +10,35 @@ async function start(){
 const data={
 token:document.getElementById("token").value,
 channel:document.getElementById("channel").value,
+type:document.getElementById("type").value,
 message:quill.root.innerHTML,
 amount:document.getElementById("amount").value,
 delay:document.getElementById("delay").value
 }
 
-log("Starting bot sender")
-
-await fetch("/sendBot",{
+await fetch("/sendToken",{
 method:"POST",
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify(data)
 })
 
-log("Finished")
-
-}
-
-function sendOnce(){
-
-document.getElementById("amount").value=1
-start()
-
 }
 
 async function stop(){
-
 await fetch("/stop",{method:"POST"})
+}
 
-log("Stopped")
+async function progress(){
+
+const r=await fetch("/progress")
+const d=await r.json()
+
+if(d.total===0) return
+
+let percent=(d.current/d.total)*100
+
+document.getElementById("bar").style.width=percent+"%"
 
 }
+
+setInterval(progress,1000)
