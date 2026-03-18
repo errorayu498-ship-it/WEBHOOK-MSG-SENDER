@@ -9,30 +9,24 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static("public"))
 
-let running = false
+let running=false
+let progress={current:0,total:0}
 
-const historyFile = "./data/history.json"
+const historyFile="./data/history.json"
 
 function saveHistory(data){
 
 let history=[]
 
 if(fs.existsSync(historyFile)){
-history = JSON.parse(fs.readFileSync(historyFile))
+history=JSON.parse(fs.readFileSync(historyFile))
 }
 
-history.push({
-...data,
-time:new Date().toISOString()
-})
+history.push({...data,time:new Date().toISOString()})
 
 fs.writeFileSync(historyFile,JSON.stringify(history,null,2))
 
 }
-
-/* -------------------------
-HTML → Discord Markdown Fix
---------------------------*/
 
 function cleanMessage(html){
 
@@ -41,75 +35,55 @@ if(!html) return ""
 return html
 .replace(/<h1>/g,"# ")
 .replace(/<\/h1>/g,"\n")
-.replace(/<h2>/g,"## ")
-.replace(/<\/h2>/g,"\n")
 .replace(/<strong>/g,"**")
 .replace(/<\/strong>/g,"**")
-.replace(/<b>/g,"**")
-.replace(/<\/b>/g,"**")
 .replace(/<em>/g,"*")
 .replace(/<\/em>/g,"*")
-.replace(/<i>/g,"*")
-.replace(/<\/i>/g,"*")
 .replace(/<p>/g,"")
 .replace(/<\/p>/g,"\n")
 .replace(/<br>/g,"\n")
-.replace(/<br\/>/g,"\n")
 .replace(/<[^>]*>/g,"")
 
 }
 
-/* -------------------------
-Webhook Sender
---------------------------*/
+async function sendMessage(token,channel,message,isBot){
 
-async function sendWebhook(url,message){
+let headers={}
 
-await axios.post(url,{
-content:message
-})
-
+if(isBot){
+headers.Authorization=`Bot ${token}`
+}else{
+headers.Authorization=token
 }
-
-/* -------------------------
-Bot Sender
---------------------------*/
-
-async function sendBot(token,channel,message){
 
 await axios.post(
 `https://discord.com/api/v10/channels/${channel}/messages`,
 {content:message},
-{headers:{Authorization:`Bot ${token}`}}
+{headers}
 )
 
 }
-
-/* -------------------------
-Webhook API
---------------------------*/
 
 app.post("/sendWebhook",async(req,res)=>{
 
 const {url,message,amount,delay}=req.body
+const msg=cleanMessage(message)
 
-const msg = cleanMessage(message)
-
-running = true
+running=true
+progress.total=amount
+progress.current=0
 
 for(let i=0;i<amount;i++){
 
 if(!running) break
 
 try{
-
-await sendWebhook(url,msg)
-
+await axios.post(url,{content:msg})
 }catch(e){
-
-console.log("Webhook Error:",e.message)
-
+console.log(e.message)
 }
+
+progress.current++
 
 await new Promise(r=>setTimeout(r,delay*1000))
 
@@ -121,69 +95,33 @@ res.json({status:"done"})
 
 })
 
-/* -------------------------
-Bot API
---------------------------*/
+app.post("/sendToken",async(req,res)=>{
 
-app.post("/sendBot",async(req,res)=>{
+const {token,channel,message,amount,delay,type}=req.body
 
-const {token,channel,message,amount,delay}=req.body
+const msg=cleanMessage(message)
 
-const msg = cleanMessage(message)
-
-running = true
+running=true
+progress.total=amount
+progress.current=0
 
 try{
-
-if(channel){
 
 for(let i=0;i<amount;i++){
 
 if(!running) break
 
-await sendBot(token,channel,msg)
+await sendMessage(token,channel,msg,type==="bot")
+
+progress.current++
 
 await new Promise(r=>setTimeout(r,delay*1000))
-
-}
-
-}else{
-
-// send to all channels
-
-const guilds = await axios.get(
-"https://discord.com/api/v10/users/@me/guilds",
-{headers:{Authorization:`Bot ${token}`}}
-)
-
-for(const g of guilds.data){
-
-const channels = await axios.get(
-`https://discord.com/api/v10/guilds/${g.id}/channels`,
-{headers:{Authorization:`Bot ${token}`}}
-)
-
-for(const c of channels.data){
-
-if(!running) break
-
-if(c.type === 0){
-
-await sendBot(token,c.id,msg)
-
-await new Promise(r=>setTimeout(r,delay*1000))
-
-}
-
-}
-
-}
 
 }
 
 }catch(e){
 
-console.log("Bot Error:",e.message)
+console.log(e.message)
 
 }
 
@@ -193,40 +131,15 @@ res.json({status:"done"})
 
 })
 
-/* -------------------------
-History API
---------------------------*/
-
-app.get("/history",(req,res)=>{
-
-if(!fs.existsSync(historyFile)){
-
-return res.json([])
-
-}
-
-res.json(JSON.parse(fs.readFileSync(historyFile)))
-
+app.get("/progress",(req,res)=>{
+res.json(progress)
 })
-
-/* -------------------------
-Stop Sender
---------------------------*/
 
 app.post("/stop",(req,res)=>{
-
-running = false
-
+running=false
 res.json({status:"stopped"})
-
 })
 
-/* -------------------------
-Server Start
---------------------------*/
-
 app.listen(3000,()=>{
-
-console.log("Webcord Portal running on port 3000")
-
+console.log("Portal running on port 3000")
 })
