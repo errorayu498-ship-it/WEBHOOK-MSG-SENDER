@@ -1,52 +1,21 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>Webcord Portal</title>
+<title>Discord Portal</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body>
 
 <div class="container">
 
-<div class="title">WEBCORD PORTAL</div>
-<div class="subtitle">MADE BY SUBHAN 🇵🇰</div>
-<div class="description">⚠ Important Notice:
-Please Use This Portal Responsibly And Follow The Rules And Policies of The Platform You Are Interacting With.</div>
-<div class="footer">CONTACT US: https://dsc.gg/warriorteam</div>
-  
-<div class="card">
-<h3>Member Use My Tools</h3>
-<div id="visitors" style="font-size:32px">Checking...</div>
-</div>
+<h1>Discord Message Portal</h1>
 
-<div class="grid">
+<p>Select a tool:</p>
 
-<div class="card">
-<h3>Webhook Sender</h3>
-<a href="webhook.html"><button>Open Tool</button></a>
-</div>
-
-<div class="card">
-<h3>Bot/User Token Sender</h3>
-<a href="token.html"><button>Open Tool</button></a>
-</div>
+<a href="webhook.html"><button>Webhook Sender</button></a>
+<a href="bot.html"><button>Bot / User Token Sender</button></a>
 
 </div>
-
-</div>
-
-<script>
-
-fetch("/visit")
-.then(r=>r.json())
-.then(d=>{
-document.getElementById("visitors").innerText=d.count
-})
-
-</script>
 
 </body>
 </html>

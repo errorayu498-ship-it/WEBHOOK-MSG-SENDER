@@ -1,39 +1,30 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-
 <title>Webhook Sender</title>
-
 <link rel="stylesheet" href="css/style.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="title">Webhook Sender</div>
+<h2>Webhook Sender</h2>
 
-<div class="card">
+<input id="webhook" placeholder="Webhook URL">
 
-<input id="url" placeholder="Webhook URL">
-
-<div id="editor">WEBCORD PORTAL | DEVELOPED BY SUBHAN (https://webcord.up.railway.app)</div>
+<div id="editor"></div>
 
 <input id="amount" type="number" placeholder="Message Amount">
-<input id="delay" type="number" placeholder="Delay Seconds">
+<input id="delay" type="number" placeholder="Delay seconds">
 
-<button onclick="start()">Start Loop</button>
-<button onclick="stop()">Stop Loop</button>
+<button onclick="sendOnce()">Send Once</button>
+<button onclick="start()">Start</button>
+<button onclick="stop()">Stop</button>
 
 <div class="progress">
 <div id="bar" class="progress-bar"></div>
-</div>
-
 </div>
 
 </div>
