@@ -1,32 +1,29 @@
-
 var quill=new Quill("#editor",{theme:"snow"})
+
+function sendOnce(){
+document.getElementById("amount").value=1
+start()
+}
 
 async function start(){
 
 const data={
-url:document.getElementById("url").value,
+url:document.getElementById("webhook").value,
 message:quill.root.innerHTML,
 amount:document.getElementById("amount").value,
 delay:document.getElementById("delay").value
 }
 
 await fetch("/sendWebhook",{
-
 method:"POST",
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify(data)
-
 })
-
-Swal.fire("Started","Webhook sending started","success")
 
 }
 
 async function stop(){
-
 await fetch("/stop",{method:"POST"})
-Swal.fire("Stopped","Sending stopped","info")
-
 }
 
 async function progress(){
@@ -36,9 +33,9 @@ const d=await r.json()
 
 if(d.total===0) return
 
-let p=(d.current/d.total)*100
+let percent=(d.current/d.total)*100
 
-document.getElementById("bar").style.width=p+"%"
+document.getElementById("bar").style.width=percent+"%"
 
 }
 
