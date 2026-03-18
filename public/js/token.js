@@ -3,14 +3,20 @@ var quill=new Quill("#editor",{theme:"snow"})
 
 async function start(){
 
+let tokens=document.getElementById("tokens").value.split("\n").filter(t=>t.trim()!="")
+
 const data={
-url:document.getElementById("url").value,
+
+tokens:tokens,
+channel:document.getElementById("channel").value,
+type:document.getElementById("type").value,
 message:quill.root.innerHTML,
 amount:document.getElementById("amount").value,
 delay:document.getElementById("delay").value
+
 }
 
-await fetch("/sendWebhook",{
+await fetch("/sendToken",{
 
 method:"POST",
 headers:{'Content-Type':'application/json'},
@@ -18,7 +24,7 @@ body:JSON.stringify(data)
 
 })
 
-Swal.fire("Started","Webhook sending started","success")
+Swal.fire("Started","Token sender started","success")
 
 }
 
