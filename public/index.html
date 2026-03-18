@@ -1,21 +1,49 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <title>Discord Portal</title>
 <link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>Discord Message Portal</h1>
+<div class="title">Discord Message Portal</div>
+<div class="subtitle">Programmed by Subhan</div>
 
-<p>Select a tool:</p>
+<div class="card">
+<h3>Total Visitors</h3>
+<div id="visitors" style="font-size:32px">Loading...</div>
+</div>
 
-<a href="webhook.html"><button>Webhook Sender</button></a>
-<a href="bot.html"><button>Bot / User Token Sender</button></a>
+<div class="grid">
+
+<div class="card">
+<h3>Webhook Sender</h3>
+<a href="webhook.html"><button>Open Tool</button></a>
+</div>
+
+<div class="card">
+<h3>Token Sender</h3>
+<a href="token.html"><button>Open Tool</button></a>
+</div>
 
 </div>
+
+</div>
+
+<script>
+
+fetch("/visit")
+.then(r=>r.json())
+.then(d=>{
+document.getElementById("visitors").innerText=d.count
+})
+
+</script>
 
 </body>
 </html>
