@@ -1,9 +1,9 @@
-⚠️ Important: Discord spam ya abuse karna Discord Terms of Service ke khilaf ho sakta hai. Is portal ko sirf testing, announcements ya automation ke liye use karein.
+## ⚠️ Important: Discord spam ya abuse karna Discord Terms of Service ke khilaf ho sakta hai. Is portal ko sirf testing, announcements ya automation ke liye use karein.
 
 
 ---
 
-🌐 Features jo portal me honge
+**🌐 Features jo portal me honge**
 
 ✅ Modern animated GUI
 ✅ Webhook add option
@@ -27,7 +27,7 @@ Refresh
 ---
 
 📁 GitHub Project Structure
-
+```
 discord-message-portal/
 │
 ├── server.js
@@ -41,11 +41,11 @@ discord-message-portal/
 │
 └── README.md
 
-
+```
 ---
 
 📦 package.json
-
+```
 {
   "name": "discord-message-portal",
   "version": "1.0.0",
@@ -57,7 +57,7 @@ discord-message-portal/
   }
 }
 
-
+```
 ---
 
 ⚙️ server.js (Backend API)
