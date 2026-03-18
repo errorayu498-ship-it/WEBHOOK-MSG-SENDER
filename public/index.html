@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Discord Message Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="panel">
+
+<h1>Discord Message Portal</h1>
+
+<input id="webhook" placeholder="Webhook URL">
+
+<input id="token" placeholder="Bot Token">
+
+<input id="channel" placeholder="Channel ID">
+
+<textarea id="message" placeholder="Type your message"></textarea>
+
+<input id="amount" type="number" placeholder="Message Amount">
+
+<input id="delay" type="number" placeholder="Rate Limit (seconds)">
+
+<div class="buttons">
+
+<button onclick="send()">Send Once</button>
+
+<button onclick="start()">Start</button>
+
+<button onclick="stop()">Stop</button>
+
+<button onclick="location.reload()">Refresh</button>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
