@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Bot Sender</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<a href="index.html">Dashboard</a>
+<a href="webhook.html">Webhook</a>
+<a href="bot.html">Bot</a>
+
+</div>
+
+<div class="main">
+
+<h2>Bot Sender</h2>
+
+<input id="token" placeholder="Bot Token">
+
+<input id="channel" placeholder="Channel ID (optional)">
+
+<div id="editor"></div>
+
+<input id="amount" type="number" placeholder="Message Amount">
+
+<input id="delay" type="number" placeholder="Rate Limit seconds">
+
+<button onclick="sendOnce()">Send 1 Msg</button>
+<button onclick="start()">Start Loop</button>
+<button onclick="stop()">Stop Loop</button>
+
+<div id="status"></div>
+
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="js/bot.js"></script>
+
+</body>
+</html>
