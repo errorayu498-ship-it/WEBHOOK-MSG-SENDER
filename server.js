@@ -18,14 +18,50 @@ function saveHistory(data){
 let history=[]
 
 if(fs.existsSync(historyFile)){
-history=JSON.parse(fs.readFileSync(historyFile))
+history = JSON.parse(fs.readFileSync(historyFile))
 }
 
-history.push(data)
+history.push({
+...data,
+time:new Date().toISOString()
+})
 
 fs.writeFileSync(historyFile,JSON.stringify(history,null,2))
 
 }
+
+/* -------------------------
+HTML → Discord Markdown Fix
+--------------------------*/
+
+function cleanMessage(html){
+
+if(!html) return ""
+
+return html
+.replace(/<h1>/g,"# ")
+.replace(/<\/h1>/g,"\n")
+.replace(/<h2>/g,"## ")
+.replace(/<\/h2>/g,"\n")
+.replace(/<strong>/g,"**")
+.replace(/<\/strong>/g,"**")
+.replace(/<b>/g,"**")
+.replace(/<\/b>/g,"**")
+.replace(/<em>/g,"*")
+.replace(/<\/em>/g,"*")
+.replace(/<i>/g,"*")
+.replace(/<\/i>/g,"*")
+.replace(/<p>/g,"")
+.replace(/<\/p>/g,"\n")
+.replace(/<br>/g,"\n")
+.replace(/<br\/>/g,"\n")
+.replace(/<[^>]*>/g,"")
+
+}
+
+/* -------------------------
+Webhook Sender
+--------------------------*/
 
 async function sendWebhook(url,message){
 
@@ -34,6 +70,10 @@ content:message
 })
 
 }
+
+/* -------------------------
+Bot Sender
+--------------------------*/
 
 async function sendBot(token,channel,message){
 
@@ -45,36 +85,53 @@ await axios.post(
 
 }
 
+/* -------------------------
+Webhook API
+--------------------------*/
+
 app.post("/sendWebhook",async(req,res)=>{
 
 const {url,message,amount,delay}=req.body
 
-running=true
+const msg = cleanMessage(message)
+
+running = true
 
 for(let i=0;i<amount;i++){
 
 if(!running) break
 
 try{
-await sendWebhook(url,message)
+
+await sendWebhook(url,msg)
+
 }catch(e){
-console.log(e.message)
+
+console.log("Webhook Error:",e.message)
+
 }
 
 await new Promise(r=>setTimeout(r,delay*1000))
+
 }
 
 saveHistory(req.body)
 
-res.send("done")
+res.json({status:"done"})
 
 })
+
+/* -------------------------
+Bot API
+--------------------------*/
 
 app.post("/sendBot",async(req,res)=>{
 
 const {token,channel,message,amount,delay}=req.body
 
-running=true
+const msg = cleanMessage(message)
+
+running = true
 
 try{
 
@@ -84,7 +141,7 @@ for(let i=0;i<amount;i++){
 
 if(!running) break
 
-await sendBot(token,channel,message)
+await sendBot(token,channel,msg)
 
 await new Promise(r=>setTimeout(r,delay*1000))
 
@@ -92,23 +149,29 @@ await new Promise(r=>setTimeout(r,delay*1000))
 
 }else{
 
-const guilds=await axios.get(
+// send to all channels
+
+const guilds = await axios.get(
 "https://discord.com/api/v10/users/@me/guilds",
 {headers:{Authorization:`Bot ${token}`}}
 )
 
 for(const g of guilds.data){
 
-const channels=await axios.get(
+const channels = await axios.get(
 `https://discord.com/api/v10/guilds/${g.id}/channels`,
 {headers:{Authorization:`Bot ${token}`}}
 )
 
 for(const c of channels.data){
 
-if(c.type===0){
+if(!running) break
 
-await sendBot(token,c.id,message)
+if(c.type === 0){
+
+await sendBot(token,c.id,msg)
+
+await new Promise(r=>setTimeout(r,delay*1000))
 
 }
 
@@ -120,34 +183,50 @@ await sendBot(token,c.id,message)
 
 }catch(e){
 
-console.log(e.message)
+console.log("Bot Error:",e.message)
 
 }
 
 saveHistory(req.body)
 
-res.send("done")
+res.json({status:"done"})
 
 })
 
+/* -------------------------
+History API
+--------------------------*/
+
 app.get("/history",(req,res)=>{
 
-if(!fs.existsSync(historyFile)) return res.json([])
+if(!fs.existsSync(historyFile)){
+
+return res.json([])
+
+}
 
 res.json(JSON.parse(fs.readFileSync(historyFile)))
 
 })
 
+/* -------------------------
+Stop Sender
+--------------------------*/
+
 app.post("/stop",(req,res)=>{
 
-running=false
+running = false
 
-res.send("stopped")
+res.json({status:"stopped"})
 
 })
 
+/* -------------------------
+Server Start
+--------------------------*/
+
 app.listen(3000,()=>{
 
-console.log("Portal running on port 3000")
+console.log("Webcord Portal running on port 3000")
 
 })
