@@ -1,22 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Discord Portal</title>
+<title>Webcord Portal</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="container">
 
-<h1>Discord Message Portal</h1>
-<div class="title">Discord Message Portal</div>
-<div class="subtitle">Programmed by Subhan</div>
-<p>Select a tool:</p>
+<h1>WEBCORD PORTAL</h1>
+<div class="title">⚠ Important Notice:
+Please use this portal responsibly and follow the rules and policies of the platform you are interacting with.</div>
+<div class="subtitle">PROGRAMMED BY WARRIOR_TEAM</div>
+<div class="subtitle">CONTACT US: https://dsc.gg/warriorteam</div>
 
-<a href="webhook.html"><button>Webhook Sender</button></a>
-<a href="bot.html"><button>Bot / User Token Sender</button></a>
+
+<div class="card">
+<h3>Total Visitors</h3>
+<div id="visitors" style="font-size:32px">Checking...</div>
+</div>
+
+
+  
+<p>SELECT A TOOL:</p>
+
+<a href="webhook.html"><button>WEBHOOK SPAMMING</button></a>
+<a href="bot.html"><button>BOT/USER TOKEN SPAMMING</button></a>
 
 </div>
+
+</div>
+
+<script>
+
+fetch("/visit")
+.then(r=>r.json())
+.then(d=>{
+document.getElementById("visitors").innerText=d.count
+})
+
+</script>
 
 </body>
 </html>
