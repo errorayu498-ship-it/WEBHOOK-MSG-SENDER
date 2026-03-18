@@ -13,6 +13,20 @@ let running=false
 let progress={current:0,total:0}
 
 const historyFile="./data/history.json"
+const visitorFile="./data/visitors.json"
+
+if(!fs.existsSync(visitorFile)){
+fs.writeFileSync(visitorFile,JSON.stringify({count:0}))
+}
+
+app.get("/visit",(req,res)=>{
+
+let v=JSON.parse(fs.readFileSync(visitorFile))
+v.count++
+fs.writeFileSync(visitorFile,JSON.stringify(v))
+res.json(v)
+
+})
 
 function saveHistory(data){
 
